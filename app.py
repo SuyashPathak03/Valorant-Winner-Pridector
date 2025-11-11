@@ -27,13 +27,24 @@ try:
 except Exception as e:
     st.error(f" Error loading dataset: {e}")
 
-# ---- Compute average team stats ----
-if 'players' in locals():
-    team_stats = players.groupby("player_team").agg({
+
+# --- Detect correct team column automatically ---
+team_col = None
+for c in players.columns:
+    if c.lower() in ["player_team", "team", "team_name", "playerteam"]:
+        team_col = c
+        break
+
+if team_col:
+    team_stats = players.groupby(team_col).agg({
         "rating": "mean",
         "acs": "mean",
         "adr": "mean"
-    }).reset_index().rename(columns={"player_team": "team"})
+    }).reset_index().rename(columns={team_col: "team"})
+else:
+    st.error("❌ Could not find team column in player_stats.csv")
+    st.stop()
+
 
     # ---- Sidebar selections ----
     st.sidebar.header("Select Match Details")
