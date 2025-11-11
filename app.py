@@ -68,23 +68,26 @@ if 'team_stats' in locals() and not team_stats.empty:
 
         # Prediction
         if st.button("Predict Winner"):
+            # Get team numeric stats
             t1 = team_stats.loc[team_stats["team"] == team1].select_dtypes(include='number').mean(numeric_only=True)
             t2 = team_stats.loc[team_stats["team"] == team2].select_dtypes(include='number').mean(numeric_only=True)
 
-            # 🔹 Use all numeric features available in the model training
-            features = [
-                "rating", "acs", "adr", "kast", "hs_percent", "fk", "fd", "fk_fd_diff"
-            ]
+            # Build full 19-feature input vector
             input_data = np.array([[
-                t1.get("rating", 1.0), t2.get("rating", 1.0),
-                t1.get("acs", 200), t2.get("acs", 200),
-                t1.get("adr", 120), t2.get("adr", 120),
-                t1.get("kast", 70), t2.get("kast", 70),
-                t1.get("hs_percent", 25), t2.get("hs_percent", 25),
-                t1.get("fk", 10), t2.get("fk", 10),
-                t1.get("fd", 10), t2.get("fd", 10),
-                t1.get("fk_fd_diff", 0), t2.get("fk_fd_diff", 0),
-                0  # picked_by_code
+                # ---- Team 1 ----
+                t1.get("rating", 1.0), t1.get("acs", 200), t1.get("adr", 120),
+                t1.get("kast", 70), t1.get("hs_percent", 25),
+                t1.get("fk", 10), t1.get("fd", 10), t1.get("fk_fd_diff", 0),
+
+                # ---- Team 2 ----
+                t2.get("rating", 1.0), t2.get("acs", 200), t2.get("adr", 120),
+                t2.get("kast", 70), t2.get("hs_percent", 25),
+                t2.get("fk", 10), t2.get("fd", 10), t2.get("fk_fd_diff", 0),
+
+                # ---- Map pick indicators ----
+                0,  # picked_by
+                1 if selected_map.lower() in team1.lower() else 0,  # picked_by_team1
+                1 if selected_map.lower() in team2.lower() else 0   # picked_by_team2
             ]])
 
             try:
@@ -96,5 +99,6 @@ if 'team_stats' in locals() and not team_stats.empty:
                     st.error(f" {team2.upper()} might WIN!")
             except Exception as e:
                 st.error(f" Prediction error: {e}")
+
 else:
     st.error(" team_aggregated_stats.csv not loaded or empty.")
