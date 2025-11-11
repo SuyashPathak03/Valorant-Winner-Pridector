@@ -73,8 +73,8 @@ if 'players' in locals() and not players.empty:
 
                 # Prediction button
                 if st.button("Predict Winner"):
-                    t1 = team_stats.loc[team_stats["team"] == team1].mean()
-                    t2 = team_stats.loc[team_stats["team"] == team2].mean()
+                    t1 = team_stats.loc[team_stats["team"] == team1].select_dtypes(include='number').mean(numeric_only=True)
+                    t2 = team_stats.loc[team_stats["team"] == team2].select_dtypes(include='number').mean(numeric_only=True)
 
                     input_data = np.array([[
                         t1.get("rating", 1.0), t2.get("rating", 1.0),
@@ -85,7 +85,7 @@ if 'players' in locals() and not players.empty:
 
                     try:
                         pred = model.predict(input_data)[0]
-                        st.subheader(f"🗺️ Map: {selected_map.upper()}")
+                        st.subheader(f" Map: {selected_map.upper()}")
                         if pred == 1:
                             st.success(f" {team1.upper()} is likely to WIN!")
                         else:
