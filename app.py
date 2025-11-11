@@ -20,7 +20,7 @@ except Exception as e:
 
 # ---- Load dataset ----
 try:
-    path = "./valorant-champions-2024"  # Adjust if your path differs
+    path = "./dataset"  # Adjust if your path differs
     players = pd.read_csv(path + "/player_stats.csv")
     maps = pd.read_csv(path + "/maps_stats.csv")
     st.success(" Dataset loaded successfully!")
